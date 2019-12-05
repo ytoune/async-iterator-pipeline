@@ -1,0 +1,12 @@
+{
+  "name": "async-iterator-pipeline",
+  "description": "",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {},
+  "author": {
+    "name": "ytoune"
+  },
+  "private": true,
+  "license": "MIT"
+}
