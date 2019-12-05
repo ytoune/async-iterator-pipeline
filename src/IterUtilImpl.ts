@@ -15,7 +15,7 @@ export class IterUtilImpl<S, T> implements AsyncIterable<T> {
 		return new IterUtilImpl(this, flatMapOp(f))
 	}
 	flat() {
-		type P = T extends (infer P)[] ? P : never
+		type P = T extends (infer P)[] ? P : T
 		return this.flatMap<P>((i: unknown) => i as P[])
 	}
 	merge<P>(iterable: AsyncIterable<P>) {
@@ -27,10 +27,72 @@ export class IterUtilImpl<S, T> implements AsyncIterable<T> {
 	take(limit: number) {
 		return new IterUtilImpl(this, takeOp(limit))
 	}
-	concat<P>(...iterables: AsyncIterable<P>[]) {
+	concat<P>(i: AsyncIterable<P>): IterUtilImpl<unknown, T | P>
+	concat<P, P2>(
+		i: AsyncIterable<P>,
+		i2: AsyncIterable<P2>,
+	): IterUtilImpl<unknown, T | P | P2>
+	concat<P, P2, P3>(
+		i: AsyncIterable<P>,
+		i2: AsyncIterable<P2>,
+		i3: AsyncIterable<P3>,
+	): IterUtilImpl<unknown, T | P | P2 | P3>
+	concat<P, P2, P3, P4>(
+		i: AsyncIterable<P>,
+		i2: AsyncIterable<P2>,
+		i3: AsyncIterable<P3>,
+		i4: AsyncIterable<P4>,
+	): IterUtilImpl<unknown, T | P | P2 | P3 | P4>
+	concat<P, P2, P3, P4, P5>(
+		i: AsyncIterable<P>,
+		i2: AsyncIterable<P2>,
+		i3: AsyncIterable<P3>,
+		i4: AsyncIterable<P4>,
+		i5: AsyncIterable<P5>,
+	): IterUtilImpl<unknown, T | P | P2 | P3 | P4 | P5>
+	concat<P, P2, P3, P4, P5, P6>(
+		i: AsyncIterable<P>,
+		i2: AsyncIterable<P2>,
+		i3: AsyncIterable<P3>,
+		i4: AsyncIterable<P4>,
+		i5: AsyncIterable<P5>,
+		i6: AsyncIterable<P6>,
+	): IterUtilImpl<unknown, T | P | P2 | P3 | P4 | P5 | P6>
+	concat<P, P2, P3, P4, P5, P6, P7>(
+		i: AsyncIterable<P>,
+		i2: AsyncIterable<P2>,
+		i3: AsyncIterable<P3>,
+		i4: AsyncIterable<P4>,
+		i5: AsyncIterable<P5>,
+		i6: AsyncIterable<P6>,
+		i7: AsyncIterable<P7>,
+	): IterUtilImpl<unknown, T | P | P2 | P3 | P4 | P5 | P6 | P7>
+	concat<P, P2, P3, P4, P5, P6, P7, P8>(
+		i: AsyncIterable<P>,
+		i2: AsyncIterable<P2>,
+		i3: AsyncIterable<P3>,
+		i4: AsyncIterable<P4>,
+		i5: AsyncIterable<P5>,
+		i6: AsyncIterable<P6>,
+		i7: AsyncIterable<P7>,
+		i8: AsyncIterable<P8>,
+	): IterUtilImpl<unknown, T | P | P2 | P3 | P4 | P5 | P6 | P7 | P8>
+	concat<P, P2, P3, P4, P5, P6, P7, P8, P9>(
+		i: AsyncIterable<P>,
+		i2: AsyncIterable<P2>,
+		i3: AsyncIterable<P3>,
+		i4: AsyncIterable<P4>,
+		i5: AsyncIterable<P5>,
+		i6: AsyncIterable<P6>,
+		i7: AsyncIterable<P7>,
+		i8: AsyncIterable<P8>,
+		i9: AsyncIterable<P9>,
+	): IterUtilImpl<unknown, T | P | P2 | P3 | P4 | P5 | P6 | P7 | P8 | P9>
+	concat<P>(...iterables: AsyncIterable<P>[]): IterUtilImpl<unknown, T | P>
+	concat<P>(...iterables: AsyncIterable<P>[]): IterUtilImpl<unknown, T | P> {
 		let tmp = this as IterUtilImpl<unknown, unknown>
 		for (const i of iterables) tmp = tmp.merge(i)
-		return tmp as IterUtilImpl<T | P, T | P>
+		return tmp as IterUtilImpl<unknown, T | P>
 	}
 	map<P>(f: (i: T) => P | Promise<P>) {
 		const f2 = async (i: T) => [await f(i)]
