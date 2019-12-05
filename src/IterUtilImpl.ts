@@ -40,6 +40,10 @@ export class IterUtilImpl<S, T> implements AsyncIterable<T> {
 		const f2 = async (i: T) => ((await f(i)) ? [i] : [])
 		return new IterUtilImpl(this, flatMapOp(f2))
 	}
+	tap(f: (i: T) => void) {
+		const f2 = async (i: T) => (await f(i), [i])
+		return new IterUtilImpl(this, flatMapOp(f2))
+	}
 	async first() {
 		for await (const i of this) return i
 	}
