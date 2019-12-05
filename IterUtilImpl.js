@@ -48,6 +48,10 @@ class IterUtilImpl {
         const f2 = async (i) => ((await f(i)) ? [i] : []);
         return new IterUtilImpl(this, flatMapOp_1.flatMapOp(f2));
     }
+    tap(f) {
+        const f2 = async (i) => (await f(i), [i]);
+        return new IterUtilImpl(this, flatMapOp_1.flatMapOp(f2));
+    }
     async first() {
         var e_1, _a;
         try {
