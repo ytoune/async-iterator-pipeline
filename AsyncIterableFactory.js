@@ -4,15 +4,10 @@ class AsyncIterableFactory {
     constructor(fact) {
         this.fact = fact;
     }
-    [Symbol.asyncIterator]() {
-        let idx_ = 0;
+    async *[Symbol.asyncIterator]() {
         const { fact } = this;
-        return {
-            async next() {
-                const idx = idx_++;
-                return { done: false, value: await fact(idx) };
-            },
-        };
+        for (let idx = 0;; ++idx)
+            yield await fact(idx);
     }
 }
 exports.AsyncIterableFactory = AsyncIterableFactory;
