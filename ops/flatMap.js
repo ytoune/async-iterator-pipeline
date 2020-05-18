@@ -5,3 +5,4 @@ exports.flatMap = (f) => async function* (iter) {
         for (const p of await f(v))
             yield p;
 };
+exports.default = exports.flatMap;

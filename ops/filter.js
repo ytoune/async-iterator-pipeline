@@ -5,3 +5,4 @@ exports.filter = (f) => async function* (iter) {
         if (await f(v))
             yield v;
 };
+exports.default = exports.filter;

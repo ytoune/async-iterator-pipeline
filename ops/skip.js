@@ -8,3 +8,4 @@ exports.skip = (skip) => async function* (iter) {
         yield v;
     }
 };
+exports.default = exports.skip;

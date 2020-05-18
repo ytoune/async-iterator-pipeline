@@ -11,4 +11,4 @@ interface Concat {
     <P>(...iterables: AsyncIterable<P>[]): <T>(i: AsyncIterable<T>) => AsyncIterable<T | P>;
 }
 export declare const concat: Concat;
-export {};
+export default concat;

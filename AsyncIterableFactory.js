@@ -11,3 +11,4 @@ class AsyncIterableFactory {
     }
 }
 exports.AsyncIterableFactory = AsyncIterableFactory;
+exports.default = AsyncIterableFactory;

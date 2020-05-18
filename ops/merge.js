@@ -6,3 +6,4 @@ exports.merge = (iterable) => async function* (iter) {
     for await (const v of iterable)
         yield v;
 };
+exports.default = exports.merge;

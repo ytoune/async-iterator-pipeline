@@ -10,3 +10,4 @@ exports.take = (take) => async function* (iter) {
             break;
     }
 };
+exports.default = exports.take;

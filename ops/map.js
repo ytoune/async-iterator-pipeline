@@ -4,3 +4,4 @@ exports.map = (f) => async function* (iter) {
     for await (const v of iter)
         yield await f(v);
 };
+exports.default = exports.map;

@@ -10,3 +10,4 @@ exports.flat = async function* (iter) {
             yield v;
     }
 };
+exports.default = exports.flat;

@@ -6,3 +6,4 @@ exports.tap = (f) => async function* (iter) {
         yield v;
     }
 };
+exports.default = exports.tap;
