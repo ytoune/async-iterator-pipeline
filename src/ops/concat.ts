@@ -71,7 +71,7 @@ interface Concat {
 }
 
 export const concat: Concat = <P>(...iterables: AsyncIterable<P>[]) =>
-	async function*<T>(iter: AsyncIterable<T>): AsyncIterable<T | P> {
+	async function* <T>(iter: AsyncIterable<T>): AsyncIterable<T | P> {
 		for await (const v of iter) yield v
 		for (const iterable of iterables) for await (const v of iterable) yield v
 	}

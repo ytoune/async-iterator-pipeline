@@ -1,6 +1,6 @@
 type Flatten<T> = T extends (infer P)[] ? P : T
 
-export const flat = async function*<T>(
+export const flat = async function* <T>(
 	iter: AsyncIterable<T>,
 ): AsyncIterable<Flatten<T>> {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

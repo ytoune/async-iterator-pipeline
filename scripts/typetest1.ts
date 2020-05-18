@@ -6,7 +6,7 @@ import { skip } from '../src/ops/skip'
 import { concat } from '../src/ops/concat'
 
 export const main = async () => {
-	const create = async function*() {
+	const create = async function* () {
 		let i: number = 0
 		try {
 			for (; i < 100; ++i) yield i

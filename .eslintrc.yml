@@ -13,10 +13,11 @@ plugins:
 rules:
   yoda: [error, always, { onlyEquality: true, exceptRange: true }]
   prettier/prettier: [error, {
-    "singleQuote": true,
-    "useTabs": true,
-    "semi": false,
-    "trailingComma": all,
+    singleQuote: true,
+    useTabs: true,
+    semi: false,
+    trailingComma: all,
+    arrowParens: avoid,
   }]
   no-use-before-define: off
   '@typescript-eslint/no-use-before-define': [error, {functions: false, classes: false, variables: false}]
