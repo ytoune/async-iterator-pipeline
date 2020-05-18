@@ -1,125 +1,181 @@
-import { flatMapOp } from './ops/flatMapOp'
-import { mergeOp } from './ops/mergeOp'
-import { skipOp } from './ops/skipOp'
-import { takeOp } from './ops/takeOp'
-
-export class IterUtilImpl<S, T> implements AsyncIterable<T> {
-	constructor(
-		private readonly list: AsyncIterable<S>,
-		private readonly mapiter: (iter: AsyncIterator<S>) => AsyncIterator<T>,
-	) {}
+export class IterUtilImpl<T> implements AsyncIterable<T> {
+	constructor(private readonly _list: AsyncIterable<T>) {}
 	[Symbol.asyncIterator]() {
-		return this.mapiter(this.list[Symbol.asyncIterator]())
-	}
-	flatMap<P>(f: (i: T) => P[] | Promise<P[]>) {
-		return new IterUtilImpl(this, flatMapOp(f))
-	}
-	flat() {
-		type P = T extends (infer P)[] ? P : T
-		return this.flatMap<P>((i: unknown) => i as P[])
-	}
-	merge<P>(iterable: AsyncIterable<P>) {
-		return new IterUtilImpl(this, mergeOp(iterable))
-	}
-	skip(offset: number) {
-		return new IterUtilImpl(this, skipOp(offset))
-	}
-	take(limit: number) {
-		return new IterUtilImpl(this, takeOp(limit))
-	}
-	concat<P>(i: AsyncIterable<P>): IterUtilImpl<unknown, T | P>
-	concat<P, P2>(
-		i: AsyncIterable<P>,
-		i2: AsyncIterable<P2>,
-	): IterUtilImpl<unknown, T | P | P2>
-	concat<P, P2, P3>(
-		i: AsyncIterable<P>,
-		i2: AsyncIterable<P2>,
-		i3: AsyncIterable<P3>,
-	): IterUtilImpl<unknown, T | P | P2 | P3>
-	concat<P, P2, P3, P4>(
-		i: AsyncIterable<P>,
-		i2: AsyncIterable<P2>,
-		i3: AsyncIterable<P3>,
-		i4: AsyncIterable<P4>,
-	): IterUtilImpl<unknown, T | P | P2 | P3 | P4>
-	concat<P, P2, P3, P4, P5>(
-		i: AsyncIterable<P>,
-		i2: AsyncIterable<P2>,
-		i3: AsyncIterable<P3>,
-		i4: AsyncIterable<P4>,
-		i5: AsyncIterable<P5>,
-	): IterUtilImpl<unknown, T | P | P2 | P3 | P4 | P5>
-	concat<P, P2, P3, P4, P5, P6>(
-		i: AsyncIterable<P>,
-		i2: AsyncIterable<P2>,
-		i3: AsyncIterable<P3>,
-		i4: AsyncIterable<P4>,
-		i5: AsyncIterable<P5>,
-		i6: AsyncIterable<P6>,
-	): IterUtilImpl<unknown, T | P | P2 | P3 | P4 | P5 | P6>
-	concat<P, P2, P3, P4, P5, P6, P7>(
-		i: AsyncIterable<P>,
-		i2: AsyncIterable<P2>,
-		i3: AsyncIterable<P3>,
-		i4: AsyncIterable<P4>,
-		i5: AsyncIterable<P5>,
-		i6: AsyncIterable<P6>,
-		i7: AsyncIterable<P7>,
-	): IterUtilImpl<unknown, T | P | P2 | P3 | P4 | P5 | P6 | P7>
-	concat<P, P2, P3, P4, P5, P6, P7, P8>(
-		i: AsyncIterable<P>,
-		i2: AsyncIterable<P2>,
-		i3: AsyncIterable<P3>,
-		i4: AsyncIterable<P4>,
-		i5: AsyncIterable<P5>,
-		i6: AsyncIterable<P6>,
-		i7: AsyncIterable<P7>,
-		i8: AsyncIterable<P8>,
-	): IterUtilImpl<unknown, T | P | P2 | P3 | P4 | P5 | P6 | P7 | P8>
-	concat<P, P2, P3, P4, P5, P6, P7, P8, P9>(
-		i: AsyncIterable<P>,
-		i2: AsyncIterable<P2>,
-		i3: AsyncIterable<P3>,
-		i4: AsyncIterable<P4>,
-		i5: AsyncIterable<P5>,
-		i6: AsyncIterable<P6>,
-		i7: AsyncIterable<P7>,
-		i8: AsyncIterable<P8>,
-		i9: AsyncIterable<P9>,
-	): IterUtilImpl<unknown, T | P | P2 | P3 | P4 | P5 | P6 | P7 | P8 | P9>
-	concat<P>(...iterables: AsyncIterable<P>[]): IterUtilImpl<unknown, T | P>
-	concat<P>(...iterables: AsyncIterable<P>[]): IterUtilImpl<unknown, T | P> {
-		let tmp = this as IterUtilImpl<unknown, unknown>
-		for (const i of iterables) tmp = tmp.merge(i)
-		return tmp as IterUtilImpl<unknown, T | P>
-	}
-	map<P>(f: (i: T) => P | Promise<P>) {
-		const f2 = async (i: T) => [await f(i)]
-		return new IterUtilImpl(this, flatMapOp(f2))
-	}
-	filter(f: (i: T) => boolean | Promise<boolean>) {
-		const f2 = async (i: T) => ((await f(i)) ? [i] : [])
-		return new IterUtilImpl(this, flatMapOp(f2))
-	}
-	tap(f: (i: T) => void) {
-		const f2 = async (i: T) => (await f(i), [i])
-		return new IterUtilImpl(this, flatMapOp(f2))
+		return this._list[Symbol.asyncIterator]()
 	}
 	async first() {
-		for await (const i of this) return i
+		for await (const i of this._list) return i
 	}
 	async last() {
 		let l: T | undefined
-		for await (const i of this) l = i
+		for await (const i of this._list) l = i
 		return l
 	}
 	async toArray() {
 		const list: T[] = []
-		for await (const i of this) list.push(i)
+		for await (const i of this._list) list.push(i)
 		return list
 	}
 	async forEach(f: (i: T) => void | Promise<void>) {
-		for await (const i of this) await f(i)
+		for await (const i of this._list) await f(i)
+	}
+	pipe<P>(op: (it: AsyncIterable<T>) => AsyncIterable<P>): IterUtilImpl<P>
+	pipe<P, P2>(
+		op: (it: AsyncIterable<T>) => AsyncIterable<P>,
+		op2: (it: AsyncIterable<P>) => AsyncIterable<P2>,
+	): IterUtilImpl<P2>
+	pipe<P, P2, P3>(
+		op: (it: AsyncIterable<T>) => AsyncIterable<P>,
+		op2: (it: AsyncIterable<P>) => AsyncIterable<P2>,
+		op3: (it: AsyncIterable<P2>) => AsyncIterable<P3>,
+	): IterUtilImpl<P3>
+	pipe<P, P2, P3, P4>(
+		op: (it: AsyncIterable<T>) => AsyncIterable<P>,
+		op2: (it: AsyncIterable<P>) => AsyncIterable<P2>,
+		op3: (it: AsyncIterable<P2>) => AsyncIterable<P3>,
+		op4: (it: AsyncIterable<P3>) => AsyncIterable<P4>,
+	): IterUtilImpl<P4>
+	pipe<P, P2, P3, P4, P5>(
+		op: (it: AsyncIterable<T>) => AsyncIterable<P>,
+		op2: (it: AsyncIterable<P>) => AsyncIterable<P2>,
+		op3: (it: AsyncIterable<P2>) => AsyncIterable<P3>,
+		op4: (it: AsyncIterable<P3>) => AsyncIterable<P4>,
+		op5: (it: AsyncIterable<P4>) => AsyncIterable<P5>,
+	): IterUtilImpl<P5>
+	pipe<P, P2, P3, P4, P5, P6>(
+		op: (it: AsyncIterable<T>) => AsyncIterable<P>,
+		op2: (it: AsyncIterable<P>) => AsyncIterable<P2>,
+		op3: (it: AsyncIterable<P2>) => AsyncIterable<P3>,
+		op4: (it: AsyncIterable<P3>) => AsyncIterable<P4>,
+		op5: (it: AsyncIterable<P4>) => AsyncIterable<P5>,
+		op6: (it: AsyncIterable<P5>) => AsyncIterable<P6>,
+	): IterUtilImpl<P6>
+	pipe<P, P2, P3, P4, P5, P6, P7>(
+		op: (it: AsyncIterable<T>) => AsyncIterable<P>,
+		op2: (it: AsyncIterable<P>) => AsyncIterable<P2>,
+		op3: (it: AsyncIterable<P2>) => AsyncIterable<P3>,
+		op4: (it: AsyncIterable<P3>) => AsyncIterable<P4>,
+		op5: (it: AsyncIterable<P4>) => AsyncIterable<P5>,
+		op6: (it: AsyncIterable<P5>) => AsyncIterable<P6>,
+		op7: (it: AsyncIterable<P6>) => AsyncIterable<P7>,
+	): IterUtilImpl<P7>
+	pipe<P, P2, P3, P4, P5, P6, P7, P8>(
+		op: (it: AsyncIterable<T>) => AsyncIterable<P>,
+		op2: (it: AsyncIterable<P>) => AsyncIterable<P2>,
+		op3: (it: AsyncIterable<P2>) => AsyncIterable<P3>,
+		op4: (it: AsyncIterable<P3>) => AsyncIterable<P4>,
+		op5: (it: AsyncIterable<P4>) => AsyncIterable<P5>,
+		op6: (it: AsyncIterable<P5>) => AsyncIterable<P6>,
+		op7: (it: AsyncIterable<P6>) => AsyncIterable<P7>,
+		op8: (it: AsyncIterable<P7>) => AsyncIterable<P8>,
+	): IterUtilImpl<P8>
+	pipe<P, P2, P3, P4, P5, P6, P7, P8, P9>(
+		op: (it: AsyncIterable<T>) => AsyncIterable<P>,
+		op2: (it: AsyncIterable<P>) => AsyncIterable<P2>,
+		op3: (it: AsyncIterable<P2>) => AsyncIterable<P3>,
+		op4: (it: AsyncIterable<P3>) => AsyncIterable<P4>,
+		op5: (it: AsyncIterable<P4>) => AsyncIterable<P5>,
+		op6: (it: AsyncIterable<P5>) => AsyncIterable<P6>,
+		op7: (it: AsyncIterable<P6>) => AsyncIterable<P7>,
+		op8: (it: AsyncIterable<P7>) => AsyncIterable<P8>,
+		op9: (it: AsyncIterable<P8>) => AsyncIterable<P9>,
+	): IterUtilImpl<P9>
+	pipe<P, P2, P3, P4, P5, P6, P7, P8, P9, P10>(
+		op: (it: AsyncIterable<T>) => AsyncIterable<P>,
+		op2: (it: AsyncIterable<P>) => AsyncIterable<P2>,
+		op3: (it: AsyncIterable<P2>) => AsyncIterable<P3>,
+		op4: (it: AsyncIterable<P3>) => AsyncIterable<P4>,
+		op5: (it: AsyncIterable<P4>) => AsyncIterable<P5>,
+		op6: (it: AsyncIterable<P5>) => AsyncIterable<P6>,
+		op7: (it: AsyncIterable<P6>) => AsyncIterable<P7>,
+		op8: (it: AsyncIterable<P7>) => AsyncIterable<P8>,
+		op9: (it: AsyncIterable<P8>) => AsyncIterable<P9>,
+		op10: (it: AsyncIterable<P9>) => AsyncIterable<P10>,
+	): IterUtilImpl<P10>
+	pipe<P, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11>(
+		op: (it: AsyncIterable<T>) => AsyncIterable<P>,
+		op2: (it: AsyncIterable<P>) => AsyncIterable<P2>,
+		op3: (it: AsyncIterable<P2>) => AsyncIterable<P3>,
+		op4: (it: AsyncIterable<P3>) => AsyncIterable<P4>,
+		op5: (it: AsyncIterable<P4>) => AsyncIterable<P5>,
+		op6: (it: AsyncIterable<P5>) => AsyncIterable<P6>,
+		op7: (it: AsyncIterable<P6>) => AsyncIterable<P7>,
+		op8: (it: AsyncIterable<P7>) => AsyncIterable<P8>,
+		op9: (it: AsyncIterable<P8>) => AsyncIterable<P9>,
+		op10: (it: AsyncIterable<P9>) => AsyncIterable<P10>,
+		op11: (it: AsyncIterable<P10>) => AsyncIterable<P11>,
+	): IterUtilImpl<P11>
+	pipe<P, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12>(
+		op: (it: AsyncIterable<T>) => AsyncIterable<P>,
+		op2: (it: AsyncIterable<P>) => AsyncIterable<P2>,
+		op3: (it: AsyncIterable<P2>) => AsyncIterable<P3>,
+		op4: (it: AsyncIterable<P3>) => AsyncIterable<P4>,
+		op5: (it: AsyncIterable<P4>) => AsyncIterable<P5>,
+		op6: (it: AsyncIterable<P5>) => AsyncIterable<P6>,
+		op7: (it: AsyncIterable<P6>) => AsyncIterable<P7>,
+		op8: (it: AsyncIterable<P7>) => AsyncIterable<P8>,
+		op9: (it: AsyncIterable<P8>) => AsyncIterable<P9>,
+		op10: (it: AsyncIterable<P9>) => AsyncIterable<P10>,
+		op11: (it: AsyncIterable<P10>) => AsyncIterable<P11>,
+		op12: (it: AsyncIterable<P11>) => AsyncIterable<P12>,
+	): IterUtilImpl<P12>
+	pipe<P, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13>(
+		op: (it: AsyncIterable<T>) => AsyncIterable<P>,
+		op2: (it: AsyncIterable<P>) => AsyncIterable<P2>,
+		op3: (it: AsyncIterable<P2>) => AsyncIterable<P3>,
+		op4: (it: AsyncIterable<P3>) => AsyncIterable<P4>,
+		op5: (it: AsyncIterable<P4>) => AsyncIterable<P5>,
+		op6: (it: AsyncIterable<P5>) => AsyncIterable<P6>,
+		op7: (it: AsyncIterable<P6>) => AsyncIterable<P7>,
+		op8: (it: AsyncIterable<P7>) => AsyncIterable<P8>,
+		op9: (it: AsyncIterable<P8>) => AsyncIterable<P9>,
+		op10: (it: AsyncIterable<P9>) => AsyncIterable<P10>,
+		op11: (it: AsyncIterable<P10>) => AsyncIterable<P11>,
+		op12: (it: AsyncIterable<P11>) => AsyncIterable<P12>,
+		op13: (it: AsyncIterable<P12>) => AsyncIterable<P13>,
+	): IterUtilImpl<P13>
+	pipe<P, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14>(
+		op: (it: AsyncIterable<T>) => AsyncIterable<P>,
+		op2: (it: AsyncIterable<P>) => AsyncIterable<P2>,
+		op3: (it: AsyncIterable<P2>) => AsyncIterable<P3>,
+		op4: (it: AsyncIterable<P3>) => AsyncIterable<P4>,
+		op5: (it: AsyncIterable<P4>) => AsyncIterable<P5>,
+		op6: (it: AsyncIterable<P5>) => AsyncIterable<P6>,
+		op7: (it: AsyncIterable<P6>) => AsyncIterable<P7>,
+		op8: (it: AsyncIterable<P7>) => AsyncIterable<P8>,
+		op9: (it: AsyncIterable<P8>) => AsyncIterable<P9>,
+		op10: (it: AsyncIterable<P9>) => AsyncIterable<P10>,
+		op11: (it: AsyncIterable<P10>) => AsyncIterable<P11>,
+		op12: (it: AsyncIterable<P11>) => AsyncIterable<P12>,
+		op13: (it: AsyncIterable<P12>) => AsyncIterable<P13>,
+		op14: (it: AsyncIterable<P13>) => AsyncIterable<P14>,
+	): IterUtilImpl<P14>
+	pipe<P, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15>(
+		op: (it: AsyncIterable<T>) => AsyncIterable<P>,
+		op2: (it: AsyncIterable<P>) => AsyncIterable<P2>,
+		op3: (it: AsyncIterable<P2>) => AsyncIterable<P3>,
+		op4: (it: AsyncIterable<P3>) => AsyncIterable<P4>,
+		op5: (it: AsyncIterable<P4>) => AsyncIterable<P5>,
+		op6: (it: AsyncIterable<P5>) => AsyncIterable<P6>,
+		op7: (it: AsyncIterable<P6>) => AsyncIterable<P7>,
+		op8: (it: AsyncIterable<P7>) => AsyncIterable<P8>,
+		op9: (it: AsyncIterable<P8>) => AsyncIterable<P9>,
+		op10: (it: AsyncIterable<P9>) => AsyncIterable<P10>,
+		op11: (it: AsyncIterable<P10>) => AsyncIterable<P11>,
+		op12: (it: AsyncIterable<P11>) => AsyncIterable<P12>,
+		op13: (it: AsyncIterable<P12>) => AsyncIterable<P13>,
+		op14: (it: AsyncIterable<P13>) => AsyncIterable<P14>,
+		op15: (it: AsyncIterable<P14>) => AsyncIterable<P15>,
+	): IterUtilImpl<P15>
+	pipe<P = unknown>(
+		...ops: ((it: AsyncIterable<P>) => AsyncIterable<P>)[]
+	): IterUtilImpl<P>
+	pipe<P = unknown>(
+		...ops: ((it: AsyncIterable<P>) => AsyncIterable<P>)[]
+	): IterUtilImpl<P> {
+		// @ts-ignore
+		let tmp: AsyncIterable<P> = this._list
+		for (const op of ops) tmp = op(tmp)
+		return new IterUtilImpl(tmp)
 	}
 }
