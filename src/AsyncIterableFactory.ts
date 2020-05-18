@@ -5,3 +5,5 @@ export class AsyncIterableFactory<T> implements AsyncIterable<T> {
 		for (let idx = 0; ; ++idx) yield await fact(idx)
 	}
 }
+
+export default AsyncIterableFactory

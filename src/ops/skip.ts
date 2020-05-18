@@ -6,3 +6,5 @@ export const skip = (skip: number) =>
 			yield v
 		}
 	}
+
+export default skip

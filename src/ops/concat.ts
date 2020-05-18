@@ -75,3 +75,5 @@ export const concat: Concat = <P>(...iterables: AsyncIterable<P>[]) =>
 		for await (const v of iter) yield v
 		for (const iterable of iterables) for await (const v of iterable) yield v
 	}
+
+export default concat

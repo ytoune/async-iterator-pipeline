@@ -9,3 +9,5 @@ export const flat = async function*<T>(
 		else yield v
 	}
 }
+
+export default flat

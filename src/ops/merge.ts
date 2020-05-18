@@ -3,3 +3,5 @@ export const merge = <P>(iterable: AsyncIterable<P>) =>
 		for await (const v of iter) yield v
 		for await (const v of iterable) yield v
 	}
+
+export default merge

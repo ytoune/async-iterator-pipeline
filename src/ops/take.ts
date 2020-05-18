@@ -7,3 +7,5 @@ export const take = (take: number) =>
 			if (take <= ++count) break
 		}
 	}
+
+export default take

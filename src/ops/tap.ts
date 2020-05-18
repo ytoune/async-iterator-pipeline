@@ -5,3 +5,5 @@ export const tap = <T>(f: (i: T) => void | Promise<void>) =>
 			yield v
 		}
 	}
+
+export default tap
