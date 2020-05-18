@@ -1,6 +1,30 @@
 # async-iterator-pipeline
 
 ```ts
+import { AsyncIteratorPipeline } from 'async-iterator-pipeline'
+import { concat, map, take, tap, flatMap, skip, filter } from 'async-iterator-pipeline/ops'
+
+const create = async function* () {
+  for (let i = 0; ; ++i) yield i
+}
+
+for await (const num of new AsyncIteratorPipeline(create()).pipe(skip(3), take(4))) {
+  console.log(num) // 3, 4, 5, 6
+}
+
+await new AsyncIteratorPipeline(create())
+  .pipe(
+    filter(i => 0 === i % 2), // 0, 2, 4, 6 ...
+    map(i => i * 2), // 0, 4, 8, 12 ...
+    skip(2), // 8, 12, 16, 20 ...
+    take(3), // 8, 12, 16
+  )
+  .forEach(async i => {
+    console.log(i)
+  })
+```
+
+```ts
 import { AsyncIteratorPipeline, AsyncIterableFactory } from 'async-iterator-pipeline'
 import { concat, map, take, tap, flatMap, skip, filter } from 'async-iterator-pipeline/ops'
 
