@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AsyncIterableFactory = void 0;
 class AsyncIterableFactory {
     constructor(fact) {
         this.fact = fact;

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.take = void 0;
 exports.take = (take) => async function* (iter) {
     let count = 0;
     if (take <= count)
