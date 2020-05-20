@@ -4,3 +4,7 @@ var IterUtil_1 = require("./IterUtil");
 Object.defineProperty(exports, "AsyncIteratorPipeline", { enumerable: true, get: function () { return IterUtil_1.IterUtil; } });
 var AsyncIterableFactory_1 = require("./AsyncIterableFactory");
 Object.defineProperty(exports, "AsyncIterableFactory", { enumerable: true, get: function () { return AsyncIterableFactory_1.AsyncIterableFactory; } });
+var fromEvent_1 = require("./fromEvent");
+Object.defineProperty(exports, "fromEvent", { enumerable: true, get: function () { return fromEvent_1.fromEvent; } });
+var fromEventEmitter_1 = require("./fromEventEmitter");
+Object.defineProperty(exports, "fromEventEmitter", { enumerable: true, get: function () { return fromEventEmitter_1.fromEventEmitter; } });
