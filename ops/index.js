@@ -1,5 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var chunk_1 = require("./chunk");
+Object.defineProperty(exports, "chunk", { enumerable: true, get: function () { return chunk_1.chunk; } });
 var concat_1 = require("./concat");
 Object.defineProperty(exports, "concat", { enumerable: true, get: function () { return concat_1.concat; } });
 var filter_1 = require("./filter");
