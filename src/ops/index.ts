@@ -1,3 +1,4 @@
+export { chunk } from './chunk'
 export { concat } from './concat'
 export { filter } from './filter'
 export { flat } from './flat'
