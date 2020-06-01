@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { readFile, writeFile } from 'fs-extra'
+import { readFile, writeFile, readJSON, writeJSON } from 'fs-extra'
 import { publish as publish2git } from 'gh-pages'
 
 const resolve = (...s: string[]) => join(__dirname, '..', ...s)
@@ -31,7 +31,7 @@ const main = async () => {
 }
 
 const readPackageJson = async (resolve: Resolve): Promise<Info> => {
-	const json = JSON.parse(await readFile(resolve('package.json'), 'utf8'))
+	const json = await readJSON(resolve('package.json'))
 	if ('object' === typeof json && json) return json
 	return {}
 }
@@ -50,24 +50,21 @@ const copyPackageJson = async ({ resolve, info, outdir }: Context) => {
 		bin,
 	} = info
 
-	const packagerow = JSON.stringify(
-		{
-			name,
-			description,
-			version,
-			main,
-			bin,
-			engines,
-			dependencies,
-			author,
-			private: private_,
-			license,
-		},
-		null,
-		2,
-	)
+	const packagerow = {
+		name,
+		description,
+		version,
+		main,
+		bin,
+		engines,
+		dependencies,
+		author,
+		private: private_,
+		license,
+		sideEffects: false,
+	}
 
-	await writeFile(resolve(outdir, 'package.json'), packagerow, 'utf8')
+	await writeJSON(resolve(outdir, 'package.json'), packagerow, { spaces: 2 })
 }
 
 const copyReadme = async ({ resolve, outdir, version }: Context) => {
