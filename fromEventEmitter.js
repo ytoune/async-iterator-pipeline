@@ -1,36 +1,24 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fromEventEmitter = void 0;
-exports.fromEventEmitter = (target, type) => {
-    const iterable = {
-        [Symbol.asyncIterator]: () => {
-            const queue = [];
-            const pins = [];
-            let done = false;
-            const handle = (event) => {
-                pins.length ? pins.pop()(event) : queue.unshift(event);
-            };
-            target.on(type, handle);
-            const next = async () => {
-                if (done)
-                    return { done: true, value: undefined };
-                const value = queue.pop();
-                if (value)
-                    return { done: false, value };
-                return { done: false, value: await new Promise(r => pins.unshift(r)) };
-            };
-            const close = async () => {
-                done = true;
-                target.off(type, handle);
-                return { done: true, value: undefined };
-            };
-            return {
-                next,
-                return: close,
-                throw: close,
-            };
-        },
+async function* fromEventEmitter(target, type) {
+    const queue = [];
+    const handle = (event) => {
+        queue.unshift(event);
+        res === null || res === void 0 ? void 0 : res();
     };
-    return iterable;
-};
-exports.default = exports.fromEventEmitter;
+    target.on(type, handle);
+    let res;
+    try {
+        for (;;) {
+            await new Promise(r => (res = r));
+            while (queue.length)
+                yield queue.pop();
+        }
+    }
+    finally {
+        target.off(type, handle);
+    }
+}
+exports.fromEventEmitter = fromEventEmitter;
+exports.default = fromEventEmitter;

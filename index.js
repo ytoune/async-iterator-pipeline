@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var IterUtil_1 = require("./IterUtil");
 Object.defineProperty(exports, "AsyncIteratorPipeline", { enumerable: true, get: function () { return IterUtil_1.IterUtil; } });
+Object.defineProperty(exports, "iterutil", { enumerable: true, get: function () { return IterUtil_1.iterutil; } });
 var AsyncIterableFactory_1 = require("./AsyncIterableFactory");
 Object.defineProperty(exports, "AsyncIterableFactory", { enumerable: true, get: function () { return AsyncIterableFactory_1.AsyncIterableFactory; } });
 var fromEvent_1 = require("./fromEvent");
