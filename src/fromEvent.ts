@@ -26,42 +26,29 @@ interface EventTarget<Event> {
 
 type Options = AddEventListenerOptions
 
-export const fromEvent = <Event>(
+export async function* fromEvent<Event>(
 	target: EventTarget<Event>,
 	type: string,
 	options?: Options,
-) => {
+): AsyncIterable<Event> {
+	const queue: Event[] = []
+	const handle = (event: Event) => {
+		queue.unshift(event)
+		res?.()
+	}
 	const { once, passive, capture } = options || {}
 	const add = options && { once, passive, capture }
 	const remove = null == capture ? undefined : { capture }
-	const iterable: AsyncIterable<Event> = {
-		[Symbol.asyncIterator]: () => {
-			const queue: Event[] = []
-			const pins: ((e: Event) => void)[] = []
-			let done = false
-			const handle = (event: Event) => {
-				pins.length ? pins.pop()!(event) : queue.unshift(event)
-			}
-			target.addEventListener(type, handle, add)
-			const next = async (): Promise<IteratorResult<Event, undefined>> => {
-				if (done) return { done: true, value: undefined }
-				const value = queue.pop()
-				if (value) return { done: false, value }
-				return { done: false, value: await new Promise(r => pins.unshift(r)) }
-			}
-			const close = async (): Promise<IteratorResult<Event, undefined>> => {
-				done = true
-				target.removeEventListener(type, handle, remove)
-				return { done: true, value: undefined }
-			}
-			return {
-				next,
-				return: close,
-				throw: close,
-			}
-		},
+	target.addEventListener(type, handle, add)
+	let res: (() => void) | undefined
+	try {
+		for (;;) {
+			await new Promise<void>(r => (res = r))
+			while (queue.length) yield queue.pop()!
+		}
+	} finally {
+		target.removeEventListener(type, handle, remove)
 	}
-	return iterable
 }
 
 export default fromEvent

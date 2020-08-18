@@ -1,18 +1,22 @@
 # async-iterator-pipeline
 
+```sh
+yarn add github:ytoune/async-iterator-pipeline#semver:v3.x
+```
+
 ```ts
-import { AsyncIteratorPipeline } from 'async-iterator-pipeline'
-import { concat, map, take, tap, flatMap, skip, filter } from 'async-iterator-pipeline/ops'
+import { iterutil } from 'async-iterator-pipeline'
+import { map, take, skip, filter } from 'async-iterator-pipeline/ops'
 
 const create = async function* () {
   for (let i = 0; ; ++i) yield i
 }
 
-for await (const num of new AsyncIteratorPipeline(create()).pipe(skip(3), take(4))) {
+for await (const num of iterutil(create()).pipe(skip(3), take(4))) {
   console.log(num) // 3, 4, 5, 6
 }
 
-await new AsyncIteratorPipeline(create())
+await iterutil(create())
   .pipe(
     filter(i => 0 === i % 2), // 0, 2, 4, 6 ...
     map(i => i * 2), // 0, 4, 8, 12 ...
