@@ -82,7 +82,7 @@ const getMajorVersion = (version: string) => {
 }
 
 const publishDir = async ({ resolve, outdir, version }: Context) => {
-	await new Promise((r, j) =>
+	await new Promise<void>((r, j) =>
 		publish2git(
 			resolve(outdir),
 			{

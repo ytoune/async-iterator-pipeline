@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 interface AddEventListenerOptions extends EventListenerOptions {
 	once?: boolean
 	passive?: boolean

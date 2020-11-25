@@ -1,4 +1,4 @@
-import { AsyncIteratorPipeline } from '../src'
+import { iterutil } from '../src'
 import { map } from '../src/ops/map'
 import { filter } from '../src/ops/filter'
 import { take } from '../src/ops/take'
@@ -7,21 +7,21 @@ import { concat } from '../src/ops/concat'
 
 export const main = async () => {
 	const create = async function* () {
-		let i: number = 0
+		let i = 0
 		try {
 			for (; i < 100; ++i) yield i
 		} finally {
 			console.log({ i })
 		}
 	}
-	await new AsyncIteratorPipeline(create())
+	await iterutil(create())
 		.pipe(
 			filter(i => 0 === i % 2),
 			map(i => 'i = ' + (i + 1)),
 			skip(3),
 			take(5),
 			concat(
-				new AsyncIteratorPipeline(create()).pipe(
+				iterutil(create()).pipe(
 					map(i => 'u = ' + i * 2),
 					take(4),
 				),
