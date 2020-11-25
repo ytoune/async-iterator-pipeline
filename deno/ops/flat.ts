@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Flatten<T> = T extends (infer P)[] ? P : T
 
-export const flat = (depth: number = 1) =>
+export const flat = (depth = 1) =>
 	async function* <T>(iter: AsyncIterable<T>): AsyncIterable<Flatten<T>> {
 		for await (const v of iter as any) {
 			if (Array.isArray(v)) {

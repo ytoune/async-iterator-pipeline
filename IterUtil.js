@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IterUtil = exports.iterutil = void 0;
-exports.iterutil = (iter) => new IterUtil(iter);
+const iterutil = (iter) => new IterUtil(iter);
+exports.iterutil = iterutil;
 class IterUtil {
     constructor(_list) {
         this._list = _list;

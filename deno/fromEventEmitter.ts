@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 interface EventEmitter {
 	/* eslint-disable @typescript-eslint/no-explicit-any */
 	on(event: string | symbol, listener: (arg: any) => void): this

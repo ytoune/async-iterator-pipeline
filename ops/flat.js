@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.flat = void 0;
-exports.flat = (depth = 1) => async function* (iter) {
+const flat = (depth = 1) => async function* (iter) {
     for await (const v of iter) {
         if (Array.isArray(v)) {
             const flattend = [];
@@ -13,6 +13,7 @@ exports.flat = (depth = 1) => async function* (iter) {
             yield v;
     }
 };
+exports.flat = flat;
 exports.default = exports.flat;
 const flatarr = (array, depth, flattend) => {
     for (const el of array) {

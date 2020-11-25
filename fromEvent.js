@@ -1,4 +1,5 @@
 "use strict";
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fromEvent = void 0;
 async function* fromEvent(target, type, options) {
