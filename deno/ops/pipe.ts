@@ -151,13 +151,13 @@ interface Pipe {
 	<P = unknown>(...ops: ((it: P) => P)[]): MapFn<P, P>
 }
 
-export const pipe: Pipe = <P = unknown>(
-	...ops: ((it: P) => P)[]
-): MapFn<P, P> => (iter: P) => {
-	// @ts-ignore
-	let tmp: P = iter
-	for (const op of ops) tmp = op(tmp)
-	return tmp
-}
+export const pipe: Pipe =
+	<P = unknown>(...ops: ((it: P) => P)[]): MapFn<P, P> =>
+	(iter: P) => {
+		// @ts-ignore
+		let tmp: P = iter
+		for (const op of ops) tmp = op(tmp)
+		return tmp
+	}
 
 export default pipe
